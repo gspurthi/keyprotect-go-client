@@ -391,7 +391,7 @@ type Policies struct {
 }
 
 // GetPolicy retrieves a policy by Key ID.
-func (c *Client) GetPolicy(ctx context.Context, id string) (*[]Policy, error) {
+func (c *Client) GetPolicy(ctx context.Context, id string) ([]Policy, error) {
 	policyresponse := Policies{}
 
 	req, err := c.newRequest("GET", fmt.Sprintf("keys/%s/policies", id), nil)
@@ -404,7 +404,7 @@ func (c *Client) GetPolicy(ctx context.Context, id string) (*[]Policy, error) {
 		return nil, err
 	}
 
-	return &policyresponse.Policies, nil
+	return policyresponse.Policies, nil
 }
 
 // SetPolicy updates a policy resource by specifying the ID of the key and the rotation interval needed.
