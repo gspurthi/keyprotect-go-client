@@ -50,11 +50,11 @@ type PolicyData struct {
 // Attributes contains the detals of allowed network policy type
 type Attributes struct {
 	AllowedNetwork      string `json:"allowed_network,omitempty"`
-	CreateRootKey       bool   `json:create_root_key, omitempty`
-	CreateStandardKey   bool   `json:create_standard_key, omitempty`
-	ImportRootKey       bool   `json:import_root_key, omitempty`
-	ImportStandardKey   bool   `json:import_standard_key, omitempty`
-	SecureImportRootKey bool   `json:secure_import_root_key`
+	CreateRootKey       *bool  `json:"create_root_key, omitempty"`
+	CreateStandardKey   *bool  `json:"create_standard_key, omitempty"`
+	ImportRootKey       *bool  `json:"import_root_key, omitempty"`
+	ImportStandardKey   *bool  `json:"import_standard_key, omitempty"`
+	SecureImportRootKey *bool  `json:"secure_import_root_key, omitempty"`
 }
 
 // InstancePolicies represents a collection of Policies associated with Key Protect instances.
@@ -99,9 +99,6 @@ func (c *Client) SetInstancePolicies(ctx context.Context, enable bool, setType s
 				Enabled:    &enable,
 				Attributes: attributes,
 			},
-		}
-		if attributes.AllowedNetwork != "" {
-			policy.PolicyData.Attributes.AllowedNetwork = attributes.AllowedNetwork
 		}
 
 	case KeyCreateImportAccess:
