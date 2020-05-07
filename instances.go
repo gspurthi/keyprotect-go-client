@@ -16,7 +16,6 @@ package kp
 
 import (
 	"context"
-	"strings"
 	"time"
 )
 
@@ -50,12 +49,12 @@ type PolicyData struct {
 
 // Attributes contains the detals of allowed network policy type
 type Attributes struct {
-	AllowedNetwork string `json:"allowed_network,omitempty"`
-	CreateRookKey bool	`json:create_root_key, omitempty`
-	CreateStandardKey bool	`json:create_standard_key, omitempty`
-	ImportRootKey bool	`json:import_root_key, omitempty`
-	ImportStandardKey bool	`json:import_standard_key, omitempty`
-	SecureImportRootKey bool	`json:secure_import_root_key`
+	AllowedNetwork      string `json:"allowed_network,omitempty"`
+	CreateRootKey       bool   `json:create_root_key, omitempty`
+	CreateStandardKey   bool   `json:create_standard_key, omitempty`
+	ImportRootKey       bool   `json:import_root_key, omitempty`
+	ImportStandardKey   bool   `json:import_standard_key, omitempty`
+	SecureImportRootKey bool   `json:secure_import_root_key`
 }
 
 // InstancePolicies represents a collection of Policies associated with Key Protect instances.
@@ -84,35 +83,38 @@ func (c *Client) GetInstancePolicies(ctx context.Context) ([]InstancePolicy, err
 // SetInstancePolicies updates a policy resource of an instance to either allowed network or dual auth or both .
 func (c *Client) SetInstancePolicies(ctx context.Context, enable bool, setType string, attributes Attributes) error {
 	var policies []InstancePolicy
+	var policy InstancePolicy
 
-	switch(setType){
-	case DualAuthDelete: 	policy := InstancePolicy{
-							PolicyType: DualAuthDelete,
-							}
-							policy.PolicyData.Enabled = &enable
-							policies = append(policies, policy)
+	switch setType {
+	case DualAuthDelete:
+		policy = InstancePolicy{
+			PolicyType: DualAuthDelete,
+		}
+		policy.PolicyData.Enabled = &enable
 
-	case AllowedNetwork: policy := InstancePolicy{
-										PolicyType: AllowedNetwork,
-										PolicyData: PolicyData{
-											Enabled:    &enable,
-											Attributes: attributes,
-										},
-									}
-									if networkType != "" {
-										policy.PolicyData.Attributes.AllowedNetwork = networkType
-									}
-									policies = append(policies, policy)
+	case AllowedNetwork:
+		policy = InstancePolicy{
+			PolicyType: AllowedNetwork,
+			PolicyData: PolicyData{
+				Enabled:    &enable,
+				Attributes: attributes,
+			},
+		}
+		if attributes.AllowedNetwork != "" {
+			policy.PolicyData.Attributes.AllowedNetwork = attributes.AllowedNetwork
+		}
 
-	case KeyCreateImportAccess: policy := InstancePolicy{
-									PolicyType: KeyCreateImportAccess
-									PolicyData: PolicyData{
-										Enabled: &enable,
-										Attributes: attributes,
-									}
-								}
+	case KeyCreateImportAccess:
+		policy = InstancePolicy{
+			PolicyType: KeyCreateImportAccess,
+			PolicyData: PolicyData{
+				Enabled:    &enable,
+				Attributes: attributes,
+			},
+		}
 	}
 
+	policies = append(policies, policy)
 
 	policyRequest := InstancePolicies{
 		Metadata: PoliciesMetadata{
