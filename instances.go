@@ -27,7 +27,7 @@ const (
 	AllowedNetwork = "allowedNetwork"
 
 	//KeyCreateImportAccess defines the policy type as create and import key access
-	KeyCreateImportAccess = "keyCreateImportMgmt"
+	KeyCreateImportAccess = "keyCreateImportAccess"
 )
 
 // InstancePolicy represents a instance-level policy of a key as returned by the KP API.
@@ -38,23 +38,23 @@ type InstancePolicy struct {
 	UpdatedAt  *time.Time `json:"lastUpdated,omitempty"`
 	UpdatedBy  string     `json:"updatedBy,omitempty"`
 	PolicyType string     `json:"policy_type,omitempty"`
-	PolicyData PolicyData `json:"policy_data,omitempty" mapstructure:"policyData"`
+	PolicyData PolicyData `json:"policy_data,omitempty"`
 }
 
 // PolicyData contains the details of the policy type
 type PolicyData struct {
-	Enabled    *bool      `json:"enabled,omitempty"`
-	Attributes Attributes `json:"attributes,omitempty"`
+	Enabled    *bool       `json:"enabled,omitempty"`
+	Attributes *Attributes `json:"attributes,omitempty"`
 }
 
 // Attributes contains the detals of allowed network policy type
 type Attributes struct {
 	AllowedNetwork      string `json:"allowed_network,omitempty"`
-	CreateRootKey       *bool  `json:"create_root_key, omitempty"`
-	CreateStandardKey   *bool  `json:"create_standard_key, omitempty"`
-	ImportRootKey       *bool  `json:"import_root_key, omitempty"`
-	ImportStandardKey   *bool  `json:"import_standard_key, omitempty"`
-	SecureImportRootKey *bool  `json:"secure_import_root_key, omitempty"`
+	CreateRootKey       *bool  `json:"create_root_key,omitempty"`
+	CreateStandardKey   *bool  `json:"create_standard_key,omitempty"`
+	ImportRootKey       *bool  `json:"import_root_key,omitempty"`
+	ImportStandardKey   *bool  `json:"import_standard_key,omitempty"`
+	SecureImportRootKey *bool  `json:"secure_import_root_key,omitempty"`
 }
 
 // InstancePolicies represents a collection of Policies associated with Key Protect instances.
@@ -76,12 +76,11 @@ func (c *Client) GetInstancePolicies(ctx context.Context) ([]InstancePolicy, err
 	if err != nil {
 		return nil, err
 	}
-
 	return policyresponse.Policies, nil
 }
 
 // SetInstancePolicies updates a policy resource of an instance to either allowed network or dual auth or both .
-func (c *Client) SetInstancePolicies(ctx context.Context, enable bool, setType string, attributes Attributes) error {
+func (c *Client) SetInstancePolicies(ctx context.Context, enable bool, setType string, attributes *Attributes) error {
 	var policies []InstancePolicy
 	var policy InstancePolicy
 
